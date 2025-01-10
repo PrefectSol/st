@@ -1,0 +1,23 @@
+--- x.c
++++ x.c
+@@ -1481,7 +1486,7 @@ xdrawglyphfontspecs(const XftGlyphFontSpec *specs, Glyph base, int len, int x, i
+ 	XftDrawGlyphFontSpec(xw.draw, fg, specs, len);
+ 
+ 	/* Render underline and strikethrough. */
+-	if (base.mode & ATTR_UNDERLINE) {
++	if (base.mode & ATTR_UNDERLINE || base.mode & ATTR_URL) {
+ 		XftDrawRect(xw.draw, fg, winx, winy + dc.font.ascent + 1,
+ 				width, 1);
+ 	}
+@@ -1836,6 +1841,11 @@ kpress(XEvent *ev)
+ 		len = XmbLookupString(xw.ime.xic, e, buf, sizeof buf, &ksym, &status);
+ 	else
+ 		len = XLookupString(e, buf, sizeof buf, &ksym, NULL);
++
++	/* KeyRelease not relevant to shortcuts */
++	if (ev->type == KeyRelease)
++		return;
++
+ 	/* 1. shortcuts */
+ 	for (bp = shortcuts; bp < shortcuts + LEN(shortcuts); bp++) {
+ 		if (ksym == bp->keysym && match(bp->mod, e->state)) {
